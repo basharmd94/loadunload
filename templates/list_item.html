@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Item List - Load Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 class="page-title">Item List</h1>
+        <a href="{% url 'load:create-item' %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Add New Item
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if items %}
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th style="width: 120px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td><strong>{{ item.code }}</strong></td>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.description|default:"-" }}</td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-sm btn-ghost btn-icon" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-ghost btn-icon" title="Delete" onclick="confirmDelete('{{ item.code }}', '{{ item.name }}')">
+                                    <i class="fas fa-trash" style="color: var(--danger-color);"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <div class="alert-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">No Items Found</div>
+                    <div>No items have been created yet. Click "Add New Item" to create your first item.</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(code, name) {
+    Swal.fire({
+        title: 'Delete Item?',
+        text: `Are you sure you want to delete "${name}" (${code})? This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // TODO: Implement delete functionality
+            Swal.fire('Deleted!', 'Item has been deleted.', 'success');
+        }
+    });
+}
+</script>
+{% endblock %}

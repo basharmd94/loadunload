@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Party Management - Load Management System{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<style>
+    .split-layout {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .split-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Party Management</h1>
+</div>
+
+<div class="split-layout">
+    <!-- Left Side: Form -->
+    <div class="form-card">
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Add New Party</h2>
+        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Last: <strong>{{ last_code }}</strong> | Next: <strong style="color: var(--primary-color);">{{ next_code }}</strong>
+        </p>
+        
+        <form method="POST" id="partyForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <span class="form-error">{{ form.name.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <span class="form-error">{{ form.phone.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.address.label }}</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                    <span class="form-error">{{ form.address.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions" style="margin-top: 1rem; padding-top: 1rem;">
+                <button type="reset" class="btn btn-outline btn-sm">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Right Side: List -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Party List</h2>
+        </div>
+        <div class="card-body">
+            <table id="partyTable" class="table" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for party in parties %}
+                    <tr>
+                        <td><strong>{{ party.code }}</strong></td>
+                        <td>{{ party.name }}</td>
+                        <td>{{ party.phone|default:"-" }}</td>
+                        <td>{{ party.address|default:"-"|truncatewords:8 }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-ghost btn-icon" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-ghost btn-icon" title="Delete" onclick="confirmDelete('{{ party.code }}', '{{ party.name }}')">
+                                <i class="fas fa-trash" style="color: var(--danger-color);"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#partyTable').DataTable({
+        pageLength: 10,
+        order: [[0, 'desc']],
+        language: {
+            search: "Search:",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ parties",
+            infoEmpty: "No parties available",
+            emptyTable: "No parties created yet"
+        }
+    });
+});
+
+function confirmDelete(code, name) {
+    Swal.fire({
+        title: 'Delete Party?',
+        text: `Are you sure you want to delete "${name}" (${code})?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/delete-party/${code}/`;
+        }
+    });
+}
+</script>
+{% endblock %}

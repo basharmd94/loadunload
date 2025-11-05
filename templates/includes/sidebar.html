@@ -1,0 +1,181 @@
+{% load static %}
+<aside class="sidebar" id="sidebar">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-logo">
+            <div class="sidebar-logo-icon">
+                <i class="fas fa-truck-loading"></i>
+            </div>
+            <span class="sidebar-logo-text">LoadMS</span>
+        </a>
+    </div>
+    
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-nav">
+        <!-- Main Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/" class="nav-link active">
+                        <span class="nav-icon"><i class="fas fa-home"></i></span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+                <!-- Master Data Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Master Data</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'load:create-party' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+                        <span>Add Party</span>
+                    </a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a href="{% url 'load:list-party' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        <span>Party List</span>
+                    </a>
+                </li> -->
+                <li class="nav-item">
+                    <a href="{% url 'load:create-item' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-plus-square"></i></span>
+                        <span>Add Item</span>
+                    </a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a href="{% url 'load:list-item' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-box"></i></span>
+                        <span>Item List</span>
+                    </a>
+                </li> -->
+            </ul>
+        </div>
+        
+        <!-- Load Management Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Load Management</div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'load:create-load-unload' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-plus-circle"></i></span>
+                        <span>Create Load Unload</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-truck"></i></span>
+                        <span>Loads Unload List</span>
+                    </a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
+                        <span>Load History</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+                        <span>Schedule</span>
+                    </a>
+                </li> -->
+            </ul>
+        </div>
+        
+
+        
+        <!-- Vehicles Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Vehicles</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-truck-moving"></i></span>
+                        <span>All Vehicles</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-tools"></i></span>
+                        <span>Maintenance</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Drivers Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Drivers</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-users"></i></span>
+                        <span>All Drivers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+                        <span>Add Driver</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Reports Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Reports</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
+                        <span>Load Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-dollar-sign"></i></span>
+                        <span>Financial Reports</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Settings Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">System</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-user-shield"></i></span>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-question-circle"></i></span>
+                        <span>Help & Support</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</aside>

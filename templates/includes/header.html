@@ -1,0 +1,66 @@
+{% load static %}
+<header class="header">
+    <div class="header-container">
+        <!-- Left Section -->
+        <div class="header-left">
+            <!-- Mobile Menu Toggle -->
+            <button class="header-icon-btn" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Search Bar -->
+            <div class="header-search">
+                <div class="form-input-icon">
+                    <span class="icon"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-input" placeholder="Search loads, vehicles, drivers...">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Section -->
+        <div class="header-right">
+            <div class="header-actions">
+                <!-- Notifications -->
+                <button class="header-icon-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"></span>
+                </button>
+                
+                <!-- Messages -->
+                <button class="header-icon-btn">
+                    <i class="fas fa-envelope"></i>
+                </button>
+                
+                <!-- Settings -->
+                <button class="header-icon-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            
+            <!-- User Profile -->
+            <div class="user-profile dropdown" id="userDropdown">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <i class="fas fa-chevron-down user-dropdown-icon"></i>
+                
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu" id="userMenu">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user" style="margin-right: 10px;"></i> Profile
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog" style="margin-right: 10px;"></i> Settings
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-question-circle" style="margin-right: 10px;"></i> Help
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'authentication:logout' %}" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

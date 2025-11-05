@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Load/Unload - Load Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: var(--bg-primary);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .form-row .form-group {
+        margin-bottom: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    .form-label {
+        font-size: 0.875rem;
+        margin-bottom: 0.375rem;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .form-textarea {
+        min-height: 70px;
+    }
+    
+    .form-help {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .page-subtitle {
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Create Load/Unload Transaction</h1>
+</div>
+
+<!-- Form -->
+<div class="form-card">
+    <form method="POST" id="loadUnloadForm">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label required">{{ form.transaction_date.label }}</label>
+                {{ form.transaction_date }}
+                {% if form.transaction_date.errors %}
+                    <span class="form-error">{{ form.transaction_date.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.transaction_type.label }}</label>
+                {{ form.transaction_type }}
+                {% if form.transaction_type.errors %}
+                    <span class="form-error">{{ form.transaction_type.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.truck_no.label }}</label>
+                {{ form.truck_no }}
+                {% if form.truck_no.errors %}
+                    <span class="form-error">{{ form.truck_no.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.challan_no.label }}</label>
+                {{ form.challan_no }}
+                {% if form.challan_no.errors %}
+                    <span class="form-error">{{ form.challan_no.errors.0 }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group" id="supplierGroup" style="display: none;">
+                <label class="form-label">{{ form.supplier.label }} <span style="color: var(--danger-color);">*</span></label>
+                {{ form.supplier }}
+                {% if form.supplier.errors %}
+                    <span class="form-error">{{ form.supplier.errors.0 }}</span>
+                {% endif %}
+                <span class="form-help">Required for Unload transactions</span>
+            </div>
+            
+            <div class="form-group" id="customerGroup" style="display: none;">
+                <label class="form-label">{{ form.customer.label }} <span style="color: var(--danger-color);">*</span></label>
+                {{ form.customer }}
+                {% if form.customer.errors %}
+                    <span class="form-error">{{ form.customer.errors.0 }}</span>
+                {% endif %}
+                <span class="form-help">Required for Load transactions</span>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label required">{{ form.item.label }}</label>
+                {{ form.item }}
+                {% if form.item.errors %}
+                    <span class="form-error">{{ form.item.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.box_type.label }}</label>
+                {{ form.box_type }}
+                {% if form.box_type.errors %}
+                    <span class="form-error">{{ form.box_type.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.box_qty.label }}</label>
+                {{ form.box_qty }}
+                {% if form.box_qty.errors %}
+                    <span class="form-error">{{ form.box_qty.errors.0 }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">{{ form.qty_type.label }}</label>
+                {{ form.qty_type }}
+                {% if form.qty_type.errors %}
+                    <span class="form-error">{{ form.qty_type.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.quantity.label }}</label>
+                {{ form.quantity }}
+                {% if form.quantity.errors %}
+                    <span class="form-error">{{ form.quantity.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.rate_per_qty.label }}</label>
+                {{ form.rate_per_qty }}
+                {% if form.rate_per_qty.errors %}
+                    <span class="form-error">{{ form.rate_per_qty.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.total_amount.label }}</label>
+                {{ form.total_amount }}
+                {% if form.total_amount.errors %}
+                    <span class="form-error">{{ form.total_amount.errors.0 }}</span>
+                {% endif %}
+                <span class="form-help">Auto-calculated based on quantity × rate</span>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">{{ form.remarks.label }}</label>
+            {{ form.remarks }}
+            {% if form.remarks.errors %}
+                <span class="form-error">{{ form.remarks.errors.0 }}</span>
+            {% endif %}
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+        <a href="{% url 'load:index' %}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-times"></i> Cancel
+        </a>
+        <button type="reset" class="btn btn-outline btn-sm">
+            <i class="fas fa-redo"></i> Reset
+        </button>
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="fas fa-save"></i> Save Transaction
+        </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Initialize Select2 on all select elements
+    $('.form-select').select2({
+        width: 'style',
+        placeholder: 'Select an option',
+        allowClear: true,
+        minimumResultsForSearch: 5
+    });
+    
+    // Show/Hide supplier and customer based on transaction type
+    function togglePartyFields() {
+        const transactionType = $('#id_transaction_type').val();
+        
+        if (transactionType === 'Load') {
+            // Show customer, hide supplier
+            $('#customerGroup').show();
+            $('#supplierGroup').hide();
+            $('#id_customer').prop('required', true);
+            $('#id_supplier').prop('required', false);
+        } else if (transactionType === 'Unload') {
+            // Show supplier, hide customer
+            $('#supplierGroup').show();
+            $('#customerGroup').hide();
+            $('#id_supplier').prop('required', true);
+            $('#id_customer').prop('required', false);
+        } else {
+            // Hide both if nothing selected
+            $('#supplierGroup').hide();
+            $('#customerGroup').hide();
+            $('#id_supplier').prop('required', false);
+            $('#id_customer').prop('required', false);
+        }
+    }
+    
+    // Initialize on page load
+    togglePartyFields();
+    
+    // Toggle on transaction type change
+    $('#id_transaction_type').on('change', togglePartyFields);
+    
+    // Auto-calculate total amount
+    function calculateTotal() {
+        const quantity = parseFloat($('#id_quantity').val()) || 0;
+        const rate = parseFloat($('#id_rate_per_qty').val()) || 0;
+        const total = (quantity * rate).toFixed(2);
+        $('#id_total_amount').val(total);
+    }
+    
+    // Calculate on input change
+    $('#id_quantity, #id_rate_per_qty').on('input', calculateTotal);
+    
+    // Form validation
+    $('#loadUnloadForm').on('submit', function(e) {
+        let isValid = true;
+        
+        // Check required fields
+        $(this).find('input[required], select[required]').each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('error');
+                isValid = false;
+            } else {
+                $(this).removeClass('error');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            showAlert('Please fill in all required fields', 'danger');
+            $('html, body').animate({
+                scrollTop: $('.error').first().offset().top - 100
+            }, 500);
+        }
+    });
+    
+    // Remove error class on input
+    $('input, select, textarea').on('input change', function() {
+        $(this).removeClass('error');
+    });
+    
+    // Confirm before reset
+    $('button[type="reset"]').on('click', function(e) {
+        if (!confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

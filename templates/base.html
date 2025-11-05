@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Load Unload Management System{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}?v=2.2">
+    <link rel="stylesheet" href="{% static 'css/component.css' %}?v=2.2">
+    <!-- data tables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css" />
+  
+
+    
+    <!-- Select2 Custom Theme -->
+    <style>
+        /* Select2 Container */
+        .select2-container--default .select2-selection--single {
+            height: auto !important;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--border-color) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-primary) !important;
+            transition: var(--transition);
+        }
+        
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 3px var(--primary-light) !important;
+            outline: none !important;
+        }
+        
+        /* Select2 Arrow */
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 100% !important;
+            top: 0 !important;
+            right: 0.5rem !important;
+        }
+        
+        /* Select2 Placeholder */
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: var(--text-secondary) !important;
+        }
+        
+        /* Select2 Selected Text */
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: var(--text-primary) !important;
+            line-height: 1.5 !important;
+            padding: 0 !important;
+        }
+        
+        /* Select2 Dropdown */
+        .select2-container--default .select2-results__option {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
+        
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: var(--primary-light) !important;
+            color: var(--primary-color) !important;
+        }
+        
+        /* Select2 Search */
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            border: 1px solid var(--border-color) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.875rem !important;
+        }
+        
+        .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+            border-color: var(--primary-color) !important;
+            outline: none !important;
+        }
+        
+        /* Select2 Dropdown Container */
+        .select2-dropdown {
+            border: 1px solid var(--border-color) !important;
+            border-radius: var(--radius-md) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+        
+        /* Select2 Clear Button */
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            color: var(--text-secondary) !important;
+            font-size: 1.2rem !important;
+            margin-right: 0.5rem !important;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+            color: var(--danger-color) !important;
+        }
+        
+        /* Make Select2 full width */
+        .select2-container {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        /* Select2 Dropdown - Match input width */
+        .select2-container {
+            display: block !important;
+        }
+        
+        .select2-dropdown {
+            max-height: 250px !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Select2 Results List - Scrollable */
+        .select2-results,
+        .select2-results__options {
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+        
+        /* Ensure dropdown doesn't exceed viewport */
+        .select2-container--open .select2-dropdown--below,
+        .select2-container--open .select2-dropdown--above {
+            max-width: 100vw !important;
+        }
+        
+        /* Scrollbar styling for Select2 */
+        .select2-results__options::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .select2-results__options::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        .select2-results__options::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        
+        .select2-results__options::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        {% include 'includes/sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            {% include 'includes/header.html' %}
+            
+            <!-- Page Content -->
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+            
+            <!-- Footer -->
+            {% include 'includes/footer.html' %}
+        </div>
+    </div>
+    
+    <!-- jQuery -->
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    
+    <!-- Select2 JS (must be after jQuery) -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}?v=1.8"></script>
+
+
+    
+    <!-- Django Messages with SweetAlert2 -->
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                Swal.fire({
+                    icon: '{% if message.tags == "error" or message.tags == "danger" %}error{% elif message.tags == "warning" %}warning{% elif message.tags == "info" %}info{% else %}success{% endif %}',
+                    title: '{% if message.tags == "error" or message.tags == "danger" %}Error{% elif message.tags == "warning" %}Warning{% elif message.tags == "info" %}Info{% else %}Success{% endif %}',
+                    text: '{{ message }}',
+                    confirmButtonColor: '#4f46e5',
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+    
+    {% block extra_js %}{% endblock %}
+    
+</body>
+</html>
