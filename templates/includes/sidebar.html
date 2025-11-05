@@ -22,12 +22,12 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                {% comment %} <li class="nav-item">
                     <a href="#" class="nav-link">
                         <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                         <span>Analytics</span>
                     </a>
-                </li>
+                </li> {% endcomment %}
             </ul>
         </div>
                 <!-- Master Data Section -->
@@ -60,44 +60,29 @@
                 </li> -->
             </ul>
         </div>
-        
-        <!-- Load Management Section -->
-        <div class="nav-section">
-            <div class="nav-section-title">Load Management</div>
-            
+
+
+        <!-- load unload section -->
+         <div class="nav-section">
+            <div class="nav-section-title">Load & Unload</div>
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="{% url 'load:create-load-unload' %}" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-plus-circle"></i></span>
-                        <span>Create Load Unload</span>
+                        <span class="nav-icon"><i class="fas fa-plus"></i></span>
+                        <span>Add Load Unload</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                        <span>Loads Unload List</span>
+                    <a href="{% url 'load:list-load-unload' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-list"></i></span>
+                        <span>Load/Unload List</span>
                     </a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
-                        <span>Load History</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
-                        <span>Schedule</span>
-                    </a>
-                </li> -->
             </ul>
         </div>
         
-
-        
         <!-- Vehicles Section -->
-        <div class="nav-section">
+        <!-- <div class="nav-section">
             <div class="nav-section-title">Vehicles</div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -113,10 +98,10 @@
                     </a>
                 </li>
             </ul>
-        </div>
+        </div> -->
         
         <!-- Drivers Section -->
-        <div class="nav-section">
+        <!-- <div class="nav-section">
             <div class="nav-section-title">Drivers</div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -132,7 +117,7 @@
                     </a>
                 </li>
             </ul>
-        </div>
+        </div> -->
         
         <!-- Reports Section -->
         <div class="nav-section">
@@ -154,7 +139,7 @@
         </div>
         
         <!-- Settings Section -->
-        <div class="nav-section">
+        <!-- <div class="nav-section">
             <div class="nav-section-title">System</div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -176,6 +161,6 @@
                     </a>
                 </li>
             </ul>
-        </div>
+        </div> -->
     </nav>
 </aside>

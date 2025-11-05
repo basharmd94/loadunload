@@ -20,70 +20,70 @@
     <div class="stats-card">
         <div class="stats-header">
             <div>
-                <div class="stats-value">248</div>
-                <div class="stats-label">Active Loads</div>
+                <div class="stats-value">{{ kpi_total_transactions }}</div>
+                <div class="stats-label">Total Transactions</div>
             </div>
             <div class="stats-icon primary">
-                <i class="fas fa-truck"></i>
+                <i class="fas fa-table"></i>
             </div>
         </div>
         <div class="stats-change positive">
-            <i class="fas fa-arrow-up"></i>
-            <span>12% from last month</span>
+            <i class="fas fa-calendar-day"></i>
+            <span>Today: {{ kpi_today_transactions }}</span>
         </div>
     </div>
     
     <div class="stats-card">
         <div class="stats-header">
             <div>
-                <div class="stats-value">45</div>
-                <div class="stats-label">Available Vehicles</div>
+                <div class="stats-value">{{ kpi_total_loads }}</div>
+                <div class="stats-label">Total Loads</div>
             </div>
             <div class="stats-icon success">
-                <i class="fas fa-truck-moving"></i>
+                <i class="fas fa-arrow-up-wide-short"></i>
             </div>
         </div>
         <div class="stats-change positive">
-            <i class="fas fa-arrow-up"></i>
-            <span>8% from last month</span>
+            <i class="fas fa-calendar-day"></i>
+            <span>Today: {{ kpi_today_loads }}</span>
         </div>
     </div>
     
     <div class="stats-card">
         <div class="stats-header">
             <div>
-                <div class="stats-value">32</div>
-                <div class="stats-label">Active Drivers</div>
+                <div class="stats-value">{{ kpi_total_unloads }}</div>
+                <div class="stats-label">Total Unloads</div>
             </div>
             <div class="stats-icon warning">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-arrow-down-wide-short"></i>
             </div>
         </div>
-        <div class="stats-change negative">
-            <i class="fas fa-arrow-down"></i>
-            <span>3% from last month</span>
+        <div class="stats-change positive">
+            <i class="fas fa-calendar-day"></i>
+            <span>Today: {{ kpi_today_unloads }}</span>
         </div>
     </div>
     
     <div class="stats-card">
         <div class="stats-header">
             <div>
-                <div class="stats-value">$125K</div>
-                <div class="stats-label">Revenue</div>
+                <div class="stats-value">{{ kpi_total_amount|floatformat:2 }}</div>
+                <div class="stats-label">Total Amount</div>
             </div>
             <div class="stats-icon danger">
-                <i class="fas fa-dollar-sign"></i>
+                <i class="fas fa-sack-dollar"></i>
             </div>
         </div>
         <div class="stats-change positive">
-            <i class="fas fa-arrow-up"></i>
-            <span>15% from last month</span>
+            <i class="fas fa-box"></i>
+            <span>Boxes: {{ kpi_total_boxes }} | Qty: {{ kpi_total_quantity|floatformat:2 }}</span>
         </div>
     </div>
 </div>
 
 <!-- Alert Example -->
-<div class="alert alert-info">
+{% comment %} <div class="alert alert-info">
     <div class="alert-icon">
         <i class="fas fa-info-circle"></i>
     </div>
@@ -91,7 +91,7 @@
         <div class="alert-title">System Update</div>
         <div>A new version of the system will be deployed tonight at 11 PM. Expected downtime: 30 minutes.</div>
     </div>
-</div>
+</div> {% endcomment %}
 
 <!-- Main Content Grid -->
 <div class="grid grid-cols-3">
@@ -99,99 +99,36 @@
     <div class="card" style="grid-column: span 2;">
         <div class="card-header">
             <h2 class="card-title">Recent Loads</h2>
-            <button class="btn btn-sm btn-primary">
-                <i class="fas fa-plus"></i> New Load
-            </button>
+            <a href="{% url 'load:recent-loads' %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-list"></i> View All
+            </a>
         </div>
         <div class="card-body">
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Load ID</th>
-                            <th>Origin</th>
-                            <th>Destination</th>
-                            <th>Driver</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>Date</th>
+                            <th>Challan</th>
+                            <th>Truck</th>
+                            <th>Customer</th>
+                            <th>Item</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for t in recent_loads %}
                         <tr>
-                            <td>#LD-2024-001</td>
-                            <td>New York, NY</td>
-                            <td>Los Angeles, CA</td>
-                            <td>John Smith</td>
-                            <td><span class="badge badge-success">In Transit</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
+                            <td>{{ t.transaction_date }}</td>
+                            <td>{{ t.challan_no }}</td>
+                            <td>{{ t.truck_no }}</td>
+                            <td>{{ t.customer.name|default:'-' }}</td>
+                            <td>{{ t.item.name }}</td>
+                            <td>{{ t.total_amount }}</td>
                         </tr>
-                        <tr>
-                            <td>#LD-2024-002</td>
-                            <td>Chicago, IL</td>
-                            <td>Miami, FL</td>
-                            <td>Sarah Johnson</td>
-                            <td><span class="badge badge-warning">Pending</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#LD-2024-003</td>
-                            <td>Houston, TX</td>
-                            <td>Seattle, WA</td>
-                            <td>Mike Davis</td>
-                            <td><span class="badge badge-primary">Scheduled</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#LD-2024-004</td>
-                            <td>Boston, MA</td>
-                            <td>Denver, CO</td>
-                            <td>Emily Brown</td>
-                            <td><span class="badge badge-success">In Transit</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#LD-2024-005</td>
-                            <td>Phoenix, AZ</td>
-                            <td>Portland, OR</td>
-                            <td>David Wilson</td>
-                            <td><span class="badge badge-danger">Delayed</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-sm btn-ghost btn-icon">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" style="text-align:center;">No recent loads</td></tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -201,56 +138,46 @@
     <!-- Quick Actions Card -->
     <div class="card">
         <div class="card-header">
-            <h2 class="card-title">Quick Actions</h2>
+            <h2 class="card-title">Latest Unloads</h2>
+            <a href="{% url 'load:recent-unloads' %}" class="btn btn-sm btn-outline">
+                <i class="fas fa-list"></i> View All
+            </a>
         </div>
         <div class="card-body">
-            <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
-                <button class="btn btn-primary btn-block">
-                    <i class="fas fa-plus"></i> Create New Load
-                </button>
-                <button class="btn btn-outline btn-block">
-                    <i class="fas fa-truck"></i> Add Vehicle
-                </button>
-                <button class="btn btn-outline btn-block">
-                    <i class="fas fa-user-plus"></i> Add Driver
-                </button>
-                <button class="btn btn-outline btn-block">
-                    <i class="fas fa-file-alt"></i> Generate Report
-                </button>
-            </div>
-            
-            <div style="margin-top: var(--spacing-xl); padding-top: var(--spacing-xl); border-top: 1px solid var(--border-color);">
-                <h3 style="font-size: var(--font-size-base); font-weight: 600; margin-bottom: var(--spacing-md);">Recent Activity</h3>
-                <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
-                    <div style="display: flex; gap: var(--spacing-md); align-items: start;">
-                        <div style="width: 8px; height: 8px; background-color: var(--success-color); border-radius: 50%; margin-top: 6px;"></div>
-                        <div style="flex: 1;">
-                            <div style="font-size: var(--font-size-sm); color: var(--text-primary);">Load #LD-2024-001 delivered</div>
-                            <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">2 hours ago</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: var(--spacing-md); align-items: start;">
-                        <div style="width: 8px; height: 8px; background-color: var(--primary-color); border-radius: 50%; margin-top: 6px;"></div>
-                        <div style="flex: 1;">
-                            <div style="font-size: var(--font-size-sm); color: var(--text-primary);">New driver registered</div>
-                            <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">5 hours ago</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: var(--spacing-md); align-items: start;">
-                        <div style="width: 8px; height: 8px; background-color: var(--warning-color); border-radius: 50%; margin-top: 6px;"></div>
-                        <div style="flex: 1;">
-                            <div style="font-size: var(--font-size-sm); color: var(--text-primary);">Vehicle maintenance due</div>
-                            <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">1 day ago</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Challan</th>
+                            <th>Truck</th>
+                            <th>Supplier</th>
+                            <th>Item</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in recent_unloads %}
+                        <tr>
+                            <td>{{ t.transaction_date }}</td>
+                            <td>{{ t.challan_no }}</td>
+                            <td>{{ t.truck_no }}</td>
+                            <td>{{ t.supplier.name|default:'-' }}</td>
+                            <td>{{ t.item.name }}</td>
+                            <td>{{ t.total_amount }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" style="text-align:center;">No recent unloads</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Component Examples Card -->
-<div class="card">
+{% comment %} <div class="card">
     <div class="card-header">
         <h2 class="card-title">Component Examples</h2>
     </div>
@@ -313,5 +240,5 @@
             </div>
         </div>
     </div>
-</div>
+</div> {% endcomment %}
 {% endblock %}

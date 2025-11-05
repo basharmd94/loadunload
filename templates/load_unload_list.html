@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Load/Unload Transactions - Load Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 class="page-title">Load/Unload Transactions</h1>
+        <a href="{% url 'load:create-load-unload' %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> New Transaction
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if transactions %}
+            <div class="table-container">
+                <table class="table" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Challan</th>
+                            <th>Truck No</th>
+                            <th>Party</th>
+                            <th>Item</th>
+                            <th>Boxes</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Total</th>
+                            <th style="width: 120px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>{{ t.transaction_date }}</td>
+                            <td>
+                                <span class="badge {% if t.transaction_type == 'Load' %}badge-success{% else %}badge-warning{% endif %}">
+                                    {{ t.transaction_type }}
+                                </span>
+                            </td>
+                            <td><strong>{{ t.challan_no }}</strong></td>
+                            <td>{{ t.truck_no }}</td>
+                            <td>
+                                {% if t.transaction_type == 'Load' %}
+                                    {{ t.customer.name|default:'-' }}
+                                {% else %}
+                                    {{ t.supplier.name|default:'-' }}
+                                {% endif %}
+                            </td>
+                            <td>{{ t.item.name }}</td>
+                            <td>{{ t.box_qty }} {{ t.box_type }}</td>
+                            <td>{{ t.quantity }} {{ t.qty_type }}</td>
+                            <td>{{ t.rate_per_qty }}</td>
+                            <td>{{ t.total_amount }}</td>
+                            <td style="text-align: center;">
+                                {# Edit route isn't defined in urls.py; keeping only delete #}
+                                <button class="btn btn-sm btn-ghost btn-icon" title="Delete" onclick="confirmDelete('{{ t.pk }}', '{{ t.transaction_type }}', '{{ t.challan_no }}')">
+                                    <i class="fas fa-trash" style="color: var(--danger-color);"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <div class="alert-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">No Transactions Found</div>
+                    <div>No load/unload transactions yet. Click "New Transaction" to create one.</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css" />
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(pk, type, challan) {
+    Swal.fire({
+        title: 'Delete Transaction?',
+        text: `Are you sure you want to delete ${type} transaction (Challan: ${challan})? This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `{% url 'load:delete-load-unload' '__PK__' %}`.replace('__PK__', pk);
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.DataTable) {
+        new DataTable('#transactionsTable', {
+            responsive: true,
+            pageLength: 25,
+            order: [[0, 'desc']],
+            layout: {
+                topStart: 'pageLength',
+                topEnd: ['search', 'buttons']
+            },
+            buttons: [
+                { extend: 'copy', exportOptions: { columns: ':not(:last-child)' } },
+                { extend: 'csv', exportOptions: { columns: ':not(:last-child)' } },
+                { extend: 'excel', exportOptions: { columns: ':not(:last-child)' } },
+                { extend: 'pdf', exportOptions: { columns: ':not(:last-child)' } },
+                { extend: 'print', exportOptions: { columns: ':not(:last-child)' } }
+            ],
+            columnDefs: [
+                { targets: -1, orderable: false, searchable: false }
+            ]
+        });
+    }
+});
+</script>
+<script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
+{% endblock %}
+
+

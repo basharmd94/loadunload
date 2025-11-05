@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import ProtectedError
 from mainapp.forms import PartyForm
 from mainapp.models import Party
 
@@ -108,6 +109,8 @@ def delete_party(request, code):
         messages.success(request, f'Party "{party_name}" ({code}) deleted successfully!')
     except Party.DoesNotExist:
         messages.error(request, f'Party with code {code} not found.')
+    except ProtectedError:
+        messages.error(request, 'Cannot delete party because it is referenced by existing transactions.')
     except Exception as e:
         messages.error(request, f'Error deleting party: {str(e)}')
     

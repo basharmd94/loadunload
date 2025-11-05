@@ -4,7 +4,6 @@
 {% block title %}Item Management - Load Management System{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <style>
     .split-layout {
         display: grid;
@@ -112,21 +111,29 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#itemTable').DataTable({
-        pageLength: 10,
-        order: [[0, 'desc']],
-        language: {
-            search: "Search:",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ items",
-            infoEmpty: "No items available",
-            emptyTable: "No items created yet",
-            
-        }
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.DataTable) {
+        new DataTable('#itemTable', {
+            responsive: true,
+            pageLength: 10,
+            order: [[0, 'desc']],
+            layout: {
+                topStart: 'pageLength',
+                topEnd: ['search']
+            },
+            language: {
+                search: 'Search:',
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ items',
+                infoEmpty: 'No items available',
+                emptyTable: 'No items created yet'
+            },
+            columnDefs: [
+                { targets: -1, orderable: false, searchable: false }
+            ]
+        });
+    }
 });
 
 function confirmDelete(code, name) {

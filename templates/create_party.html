@@ -4,7 +4,6 @@
 {% block title %}Party Management - Load Management System{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <style>
     .split-layout {
         display: grid;
@@ -28,10 +27,14 @@
 <div class="split-layout">
     <!-- Left Side: Form -->
     <div class="form-card">
-        <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Add New Party</h2>
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">
+            {% if editing %}Edit Party: {{ edit_party.code }}{% else %}Add New Party{% endif %}
+        </h2>
+        {% if not editing %}
         <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
             Last: <strong>{{ last_code }}</strong> | Next: <strong style="color: var(--primary-color);">{{ next_code }}</strong>
         </p>
+        {% endif %}
         
         <form method="POST" id="partyForm">
             {% csrf_token %}
@@ -61,11 +64,17 @@
             </div>
             
             <div class="form-actions" style="margin-top: 1rem; padding-top: 1rem;">
+                {% if editing %}
+                <a href="{% url 'load:create-party' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                {% else %}
                 <button type="reset" class="btn btn-outline btn-sm">
                     <i class="fas fa-redo"></i> Reset
                 </button>
+                {% endif %}
                 <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="fas fa-save"></i> Save
+                    <i class="fas fa-save"></i> {% if editing %}Update{% else %}Save{% endif %}
                 </button>
             </div>
         </form>
@@ -95,9 +104,9 @@
                         <td>{{ party.phone|default:"-" }}</td>
                         <td>{{ party.address|default:"-"|truncatewords:8 }}</td>
                         <td>
-                            <button class="btn btn-sm btn-ghost btn-icon" title="Edit">
+                            <a href="{% url 'load:edit-party' party.code %}" class="btn btn-sm btn-ghost btn-icon" title="Edit">
                                 <i class="fas fa-edit"></i>
-                            </button>
+                            </a>
                             <button class="btn btn-sm btn-ghost btn-icon" title="Delete" onclick="confirmDelete('{{ party.code }}', '{{ party.name }}')">
                                 <i class="fas fa-trash" style="color: var(--danger-color);"></i>
                             </button>
@@ -112,20 +121,29 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#partyTable').DataTable({
-        pageLength: 10,
-        order: [[0, 'desc']],
-        language: {
-            search: "Search:",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ parties",
-            infoEmpty: "No parties available",
-            emptyTable: "No parties created yet"
-        }
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.DataTable) {
+        new DataTable('#partyTable', {
+            responsive: true,
+            pageLength: 10,
+            order: [[0, 'desc']],
+            layout: {
+                topStart: 'pageLength',
+                topEnd: ['search']
+            },
+            language: {
+                search: 'Search:',
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ parties',
+                infoEmpty: 'No parties available',
+                emptyTable: 'No parties created yet'
+            },
+            columnDefs: [
+                { targets: -1, orderable: false, searchable: false }
+            ]
+        });
+    }
 });
 
 function confirmDelete(code, name) {

@@ -45,9 +45,9 @@ class LoadUnload(models.Model):
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
     truck_no = models.CharField(max_length=50)
     challan_no = models.CharField(max_length=50)
-    supplier = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='supplied_transactions', null=True, blank=True)
-    customer = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='customer_transactions', null=True, blank=True)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    supplier = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='supplied_transactions', null=True, blank=True)
+    customer = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='customer_transactions', null=True, blank=True)
+    item = models.ForeignKey(Item, on_delete=models.PROTECT)
 
     box_type = models.CharField(max_length=20, choices=BOX_TYPE_CHOICES)
     box_qty = models.PositiveIntegerField()

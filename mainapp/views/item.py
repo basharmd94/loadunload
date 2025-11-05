@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import ProtectedError
 from mainapp.forms import ItemForm
 from mainapp.models import Item
 
@@ -108,6 +109,8 @@ def delete_item(request, code):
         messages.success(request, f'Item "{item_name}" ({code}) deleted successfully!')
     except Item.DoesNotExist:
         messages.error(request, f'Item with code {code} not found.')
+    except ProtectedError:
+        messages.error(request, 'Cannot delete item because it is used in existing transactions.')
     except Exception as e:
         messages.error(request, f'Error deleting item: {str(e)}')
     

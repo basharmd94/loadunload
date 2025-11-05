@@ -75,7 +75,13 @@
 {% block content %}
 <!-- Page Header -->
 <div class="page-header">
-    <h1 class="page-title">Create Load/Unload Transaction</h1>
+    <h1 class="page-title">
+        {% if editing %}
+            Edit Transaction - {{ transaction.challan_no }}
+        {% else %}
+            Create Load/Unload Transaction
+        {% endif %}
+    </h1>
 </div>
 
 <!-- Form -->
@@ -208,15 +214,18 @@
         
         <!-- Form Actions -->
         <div class="form-actions">
-        <a href="{% url 'load:index' %}" class="btn btn-secondary btn-sm">
+        <a href="{% url 'load:list-load-unload' %}" class="btn btn-secondary btn-sm">
             <i class="fas fa-times"></i> Cancel
         </a>
+        {% if not editing %}
         <button type="reset" class="btn btn-outline btn-sm">
             <i class="fas fa-redo"></i> Reset
         </button>
+        {% endif %}
         <button type="submit" class="btn btn-primary btn-sm">
-            <i class="fas fa-save"></i> Save Transaction
+            <i class="fas fa-save"></i> {% if editing %}Update{% else %}Save{% endif %} Transaction
         </button>
+
         </div>
     </form>
 </div>
