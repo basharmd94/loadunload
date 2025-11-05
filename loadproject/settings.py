@@ -31,10 +31,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-#lo+l%k@1+x2o6hv-qdhv1^*x)k00vs-k$#e=!398%16-q^+ng')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG')
+DEBUG = os.getenv('DEBUG', 'True')
 
 # Allowed hosts if debug is True then allow all hosts else allow the environment variable ALLOWED_HOSTS
-ALLOWED_HOSTS = ['localhost', '127.0.0.1'] if DEBUG else [h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.strip()]
+
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.strip()]
+
 
 # Application definition
 
