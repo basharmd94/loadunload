@@ -31,21 +31,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-#lo+l%k@1+x2o6hv-qdhv1^*x)k00vs-k$#e=!398%16-q^+ng')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-def _env_bool(name: str, default: bool = False) -> bool:
-    value = os.getenv(name)
-    if value is None:
-        return default
-    return value.strip().lower() in ('1', 'true', 'yes', 'on')
+DEBUG = os.getenv('DEBUG')
 
-DEBUG = _env_bool('DEBUG', True)
-
-_allowed_hosts = os.getenv('ALLOWED_HOSTS', '')
-if _allowed_hosts:
-    ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(',') if h.strip()]
-else:
-    # Sensible defaults: allow local hosts in DEBUG, require explicit hosts in production
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1'] if DEBUG else []
-
+# Allowed hosts if debug is True then allow all hosts else allow the environment variable ALLOWED_HOSTS
+ALLOWED_HOSTS = ['localhost', '127.0.0.1'] if DEBUG else [h.strip() for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
 # Application definition
 
@@ -151,7 +140,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = _env_bool('USE_TZ', True)
+USE_TZ = os.getenv('USE_TZ', 'True')
 
 
 # Static files (CSS, JavaScript, Images)
