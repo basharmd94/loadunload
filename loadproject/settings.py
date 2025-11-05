@@ -11,6 +11,14 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+# Optional: load environment variables from a .env file if python-dotenv is installed
+try:
+    from dotenv import load_dotenv  # type: ignore
+    load_dotenv()
+except Exception:
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +28,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#lo+l%k@1+x2o6hv-qdhv1^*x)k00vs-k$#e=!398%16-q^+ng'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-#lo+l%k@1+x2o6hv-qdhv1^*x)k00vs-k$#e=!398%16-q^+ng')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ('1', 'true', 'yes', 'on')
 
-ALLOWED_HOSTS = []
+DEBUG = _env_bool('DEBUG', True)
+
+_allowed_hosts = os.getenv('ALLOWED_HOSTS', '')
+if _allowed_hosts:
+    ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(',') if h.strip()]
+else:
+    # Sensible defaults: allow local hosts in DEBUG, require explicit hosts in production
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1'] if DEBUG else []
 
 
 # Application definition
@@ -75,12 +94,31 @@ WSGI_APPLICATION = 'loadproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+_db_engine = os.getenv('DB_ENGINE', 'django.db.backends.postgresql')
+_db_name = os.getenv('DB_NAME', str(BASE_DIR / 'db.sqlite3'))
+_db_user = os.getenv('DB_USER', '')
+_db_password = os.getenv('DB_PASSWORD', '')
+_db_host = os.getenv('DB_HOST', '')
+_db_port = os.getenv('DB_PORT', '')
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': _db_engine or 'django.db.backends.postgresql',
+            'NAME': _db_name,
+            'USER': _db_user,
+            'PASSWORD': _db_password,
+            'HOST': _db_host,
+            'PORT': _db_port,
+        }
+    }
 
 
 # Password validation
@@ -105,27 +143,27 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', 'en-us')
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = _env_bool('USE_TZ', True)
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = os.getenv('STATIC_URL', '/static/')
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = Path(os.getenv('STATIC_ROOT', str(BASE_DIR / 'staticfiles')))
 
 # Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
+MEDIA_ROOT = Path(os.getenv('MEDIA_ROOT', str(BASE_DIR / 'media')))
 
 
 # Default primary key field type
@@ -134,6 +172,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication settings
-LOGIN_URL = '/auth/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/auth/login/'
+LOGIN_URL = os.getenv('LOGIN_URL', '/auth/login/')
+LOGIN_REDIRECT_URL = os.getenv('LOGIN_REDIRECT_URL', '/')
+LOGOUT_REDIRECT_URL = os.getenv('LOGOUT_REDIRECT_URL', '/auth/login/')
