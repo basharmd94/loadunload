@@ -6,6 +6,7 @@ from .views import party
 from .views import employee
 from .views import category
 from .views import expense
+from .views import reports
 
 app_name = 'load'
 
@@ -44,4 +45,7 @@ urlpatterns = [
     path('create-expense/', expense.create_expense, name='create-expense'),
     path('list-gl/', expense.list_gl, name='list-gl'),
     path('delete-expense/<int:pk>/', expense.delete_expense, name='delete-expense'),
+
+# reports
+    path('financial-report/', reports.financial_report, name='financial-report'),
 ]

@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Financial Report - Load Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Filter Bar */
+    .report-filter-bar {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-end;
+        gap: 1rem;
+        flex-wrap: wrap;
+        box-shadow: var(--shadow-sm);
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+    .filter-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .filter-group input[type="date"] {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        transition: var(--transition);
+        min-width: 170px;
+    }
+    .filter-group input[type="date"]:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+        outline: none;
+    }
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    /* Period badge */
+    .period-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: var(--primary-light);
+        color: var(--primary-color);
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: auto;
+    }
+
+    /* Summary Cards Row */
+    .gl-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) {
+        .gl-summary { grid-template-columns: 1fr; }
+        .report-filter-bar { flex-direction: column; align-items: stretch; }
+        .period-badge { margin-left: 0; }
+    }
+
+    .gl-summary-card {
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .gl-summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    .gl-summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+    }
+
+    /* Income Card */
+    .gl-card-income {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 1px solid #bbf7d0;
+    }
+    .gl-card-income::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+    .gl-card-income .gl-card-icon { background: #22c55e; color: white; }
+    .gl-card-income .gl-card-value { color: #15803d; }
+
+    /* Expense Card */
+    .gl-card-expense {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border: 1px solid #fecaca;
+    }
+    .gl-card-expense::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+    .gl-card-expense .gl-card-icon { background: #ef4444; color: white; }
+    .gl-card-expense .gl-card-value { color: #dc2626; }
+
+    /* Profit Card */
+    .gl-card-profit {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border: 1px solid #bfdbfe;
+    }
+    .gl-card-profit::before { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+    .gl-card-profit .gl-card-icon { background: #3b82f6; color: white; }
+    .gl-card-profit .gl-card-value { color: #1d4ed8; }
+
+    .gl-card-profit.loss {
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        border: 1px solid #fed7aa;
+    }
+    .gl-card-profit.loss::before { background: linear-gradient(90deg, #f97316, #ea580c); }
+    .gl-card-profit.loss .gl-card-icon { background: #f97316; color: white; }
+    .gl-card-profit.loss .gl-card-value { color: #ea580c; }
+
+    .gl-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .gl-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    .gl-card-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .gl-card-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    .gl-card-sub {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+
+    /* GL Table Type Badges */
+    .gl-type-income {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .gl-type-expense {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* Amount styling */
+    .amount-income { color: #15803d; font-weight: 600; }
+    .amount-expense { color: #dc2626; font-weight: 600; }
+    .balance-positive { color: #15803d; font-weight: 600; }
+    .balance-negative { color: #dc2626; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav class="breadcrumb">
+        <a href="/" class="breadcrumb-item">Home</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-item">Financial Report</span>
+    </nav>
+    <h1 class="page-title">Financial Report</h1>
+    <p class="page-subtitle">Filter by date range to view income, expenses, and profit/loss for any period.</p>
+</div>
+
+<!-- Filter Bar -->
+<div class="report-filter-bar">
+    <div class="filter-group">
+        <label for="fromDate"><i class="fas fa-calendar-alt"></i> From Date</label>
+        <input type="date" id="fromDate" value="{{ from_date }}">
+    </div>
+    <div class="filter-group">
+        <label for="toDate"><i class="fas fa-calendar-alt"></i> To Date</label>
+        <input type="date" id="toDate" value="{{ to_date }}">
+    </div>
+    <div class="filter-actions">
+        <button class="btn btn-primary btn-sm" id="btnSearch" onclick="applyFilter()">
+            <i class="fas fa-search"></i> Search
+        </button>
+        <button class="btn btn-outline btn-sm" id="btnReset" onclick="resetFilter()">
+            <i class="fas fa-redo"></i> Reset
+        </button>
+    </div>
+    {% if filtered %}
+    <div class="period-badge">
+        <i class="fas fa-filter"></i>
+        {% if from_date and to_date %}
+            {{ from_date }} &mdash; {{ to_date }}
+        {% elif from_date %}
+            From {{ from_date }}
+        {% elif to_date %}
+            Up to {{ to_date }}
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Summary Cards -->
+<div class="gl-summary">
+    <!-- Total Income -->
+    <div class="gl-summary-card gl-card-income">
+        <div class="gl-card-header">
+            <div class="gl-card-icon">
+                <i class="fas fa-arrow-trend-up"></i>
+            </div>
+            <div class="gl-card-label">Total Income</div>
+        </div>
+        <div class="gl-card-value">৳ {{ total_income|floatformat:2 }}</div>
+        <div class="gl-card-sub">
+            <i class="fas fa-truck-loading"></i>
+            {% if filtered %}Filtered period{% else %}All time{% endif %}
+        </div>
+    </div>
+
+    <!-- Total Expense -->
+    <div class="gl-summary-card gl-card-expense">
+        <div class="gl-card-header">
+            <div class="gl-card-icon">
+                <i class="fas fa-arrow-trend-down"></i>
+            </div>
+            <div class="gl-card-label">Total Expenses</div>
+        </div>
+        <div class="gl-card-value">৳ {{ total_expense|floatformat:2 }}</div>
+        <div class="gl-card-sub">
+            <i class="fas fa-receipt"></i>
+            {% if filtered %}Filtered period{% else %}All time{% endif %}
+        </div>
+    </div>
+
+    <!-- Net Profit/Loss -->
+    <div class="gl-summary-card gl-card-profit {% if net_profit < 0 %}loss{% endif %}">
+        <div class="gl-card-header">
+            <div class="gl-card-icon">
+                {% if net_profit >= 0 %}
+                <i class="fas fa-chart-line"></i>
+                {% else %}
+                <i class="fas fa-chart-line-down"></i>
+                {% endif %}
+            </div>
+            <div class="gl-card-label">
+                {% if net_profit >= 0 %}Net Profit{% else %}Net Loss{% endif %}
+            </div>
+        </div>
+        <div class="gl-card-value">৳ {{ net_profit|floatformat:2 }}</div>
+        <div class="gl-card-sub">
+            {% if net_profit >= 0 %}
+            <i class="fas fa-check-circle"></i> Profitable
+            {% else %}
+            <i class="fas fa-exclamation-triangle"></i> Expenses exceed income
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Report Table -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-file-invoice-dollar" style="color: var(--primary-color);"></i> Account Entries</h2>
+    </div>
+    <div class="card-body">
+        <table id="reportTable" class="table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Employee</th>
+                    <th style="text-align: right;">Income (৳)</th>
+                    <th style="text-align: right;">Expense (৳)</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.transaction_date|date:"d M Y" }}</td>
+                    <td>
+                        {% if entry.gl_type == 'INCOME' %}
+                        <span class="gl-type-income"><i class="fas fa-arrow-up"></i> Income</span>
+                        {% else %}
+                        <span class="gl-type-expense"><i class="fas fa-arrow-down"></i> Expense</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ entry.category.name|default:"-" }}</td>
+                    <td>{{ entry.description|truncatewords:10 }}</td>
+                    <td>{{ entry.employee.name|default:"-" }}</td>
+                    <td style="text-align: right;">
+                        {% if entry.gl_type == 'INCOME' %}
+                        <span class="amount-income">{{ entry.amount|floatformat:2 }}</span>
+                        {% else %}-{% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        {% if entry.gl_type == 'EXPENSE' %}
+                        <span class="amount-expense">{{ entry.amount|floatformat:2 }}</span>
+                        {% else %}-{% endif %}
+                    </td>
+                    <td>
+                        {% if entry.load_unload %}
+                        <span class="badge badge-info" title="Auto-posted from Load/Unload">
+                            <i class="fas fa-link"></i> Auto
+                        </span>
+                        {% else %}
+                        <span class="badge badge-secondary">Manual</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr style="font-weight: 700; background: var(--bg-secondary);">
+                    <td colspan="5" style="text-align: right;">Totals:</td>
+                    <td style="text-align: right;">
+                        <span class="amount-income">৳ {{ total_income|floatformat:2 }}</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <span class="amount-expense">৳ {{ total_expense|floatformat:2 }}</span>
+                    </td>
+                    <td>
+                        {% if net_profit >= 0 %}
+                        <span class="balance-positive">Profit: ৳ {{ net_profit|floatformat:2 }}</span>
+                        {% else %}
+                        <span class="balance-negative">Loss: ৳ {{ net_profit|floatformat:2 }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.DataTable) {
+        new DataTable('#reportTable', {
+            responsive: true,
+            pageLength: 25,
+            order: [[0, 'desc']],
+            layout: {
+                topStart: 'pageLength',
+                topEnd: ['search']
+            },
+            language: {
+                search: 'Search:',
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                infoEmpty: 'No entries found',
+                emptyTable: 'No entries found for the selected period'
+            },
+            columnDefs: [
+                { targets: [5, 6], type: 'num' }
+            ]
+        });
+    }
+});
+
+function applyFilter() {
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+    
+    if (!fromDate && !toDate) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Select Dates',
+            text: 'Please select at least one date to filter.',
+            confirmButtonColor: '#4f46e5',
+        });
+        return;
+    }
+    
+    const params = new URLSearchParams();
+    if (fromDate) params.set('from_date', fromDate);
+    if (toDate) params.set('to_date', toDate);
+    
+    window.location.href = '{% url "load:financial-report" %}?' + params.toString();
+}
+
+function resetFilter() {
+    window.location.href = '{% url "load:financial-report" %}';
+}
+
+// Enter key triggers search
+document.getElementById('fromDate').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') applyFilter();
+});
+document.getElementById('toDate').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') applyFilter();
+});
+</script>
+{% endblock %}
