@@ -22,15 +22,10 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                {% comment %} <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                        <span>Analytics</span>
-                    </a>
-                </li> {% endcomment %}
             </ul>
         </div>
-                <!-- Master Data Section -->
+
+        <!-- Master Data Section -->
         <div class="nav-section">
             <div class="nav-section-title">Master Data</div>
             <ul class="nav-menu">
@@ -40,30 +35,29 @@
                         <span>Add Party</span>
                     </a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a href="{% url 'load:list-party' %}" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-users"></i></span>
-                        <span>Party List</span>
-                    </a>
-                </li> -->
                 <li class="nav-item">
                     <a href="{% url 'load:create-item' %}" class="nav-link">
                         <span class="nav-icon"><i class="fas fa-plus-square"></i></span>
                         <span>Add Item</span>
                     </a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a href="{% url 'load:list-item' %}" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-box"></i></span>
-                        <span>Item List</span>
+                <li class="nav-item">
+                    <a href="{% url 'load:create-employee' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-user-tie"></i></span>
+                        <span>Add Employee</span>
                     </a>
-                </li> -->
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'load:create-category' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-tags"></i></span>
+                        <span>Add Category</span>
+                    </a>
+                </li>
             </ul>
         </div>
 
-
-        <!-- load unload section -->
-         <div class="nav-section">
+        <!-- Load Unload Section -->
+        <div class="nav-section">
             <div class="nav-section-title">Load & Unload</div>
             <ul class="nav-menu">
                 <li class="nav-item">
@@ -80,44 +74,25 @@
                 </li>
             </ul>
         </div>
-        
-        <!-- Vehicles Section -->
-        <!-- <div class="nav-section">
-            <div class="nav-section-title">Vehicles</div>
+
+        <!-- Accounts Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Accounts</div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-truck-moving"></i></span>
-                        <span>All Vehicles</span>
+                    <a href="{% url 'load:create-expense' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-receipt"></i></span>
+                        <span>Add Expense</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-tools"></i></span>
-                        <span>Maintenance</span>
+                    <a href="{% url 'load:list-gl' %}" class="nav-link">
+                        <span class="nav-icon"><i class="fas fa-book"></i></span>
+                        <span>GL Detail (Ledger)</span>
                     </a>
                 </li>
             </ul>
-        </div> -->
-        
-        <!-- Drivers Section -->
-        <!-- <div class="nav-section">
-            <div class="nav-section-title">Drivers</div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-users"></i></span>
-                        <span>All Drivers</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
-                        <span>Add Driver</span>
-                    </a>
-                </li>
-            </ul>
-        </div> -->
+        </div>
         
         <!-- Reports Section -->
         <div class="nav-section">
@@ -137,30 +112,5 @@
                 </li>
             </ul>
         </div>
-        
-        <!-- Settings Section -->
-        <!-- <div class="nav-section">
-            <div class="nav-section-title">System</div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-cog"></i></span>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-user-shield"></i></span>
-                        <span>User Management</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon"><i class="fas fa-question-circle"></i></span>
-                        <span>Help & Support</span>
-                    </a>
-                </li>
-            </ul>
-        </div> -->
     </nav>
 </aside>

@@ -2,7 +2,33 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from mainapp.forms import LoadUnloadForm
-from mainapp.models import LoadUnload
+from mainapp.models import LoadUnload, GLDetail
+
+
+def auto_post_gl_income(load_unload, user=None):
+    """Auto-create or update a GLDetail INCOME entry for a LoadUnload transaction"""
+    party_name = ''
+    if load_unload.transaction_type == 'Load' and load_unload.customer:
+        party_name = load_unload.customer.name
+    elif load_unload.transaction_type == 'Unload' and load_unload.supplier:
+        party_name = load_unload.supplier.name
+    
+    description = f"{load_unload.transaction_type} - Challan#{load_unload.challan_no} - {load_unload.truck_no}"
+    if party_name:
+        description += f" - {party_name}"
+    
+    # Check if GL entry already exists for this load_unload
+    gl_entry, created = GLDetail.objects.update_or_create(
+        load_unload=load_unload,
+        defaults={
+            'transaction_date': load_unload.transaction_date,
+            'gl_type': GLDetail.INCOME,
+            'description': description,
+            'amount': load_unload.total_amount,
+            'created_by': user,
+        }
+    )
+    return gl_entry
 
 
 @login_required
@@ -17,6 +43,10 @@ def create_load_unload(request, pk=None):
         form = LoadUnloadForm(request.POST, instance=transaction_instance)
         if form.is_valid():
             load_unload = form.save()
+            
+            # Auto-post to GLDetail as INCOME
+            auto_post_gl_income(load_unload, user=request.user)
+            
             if transaction_instance:
                 messages.success(
                     request, 
@@ -62,12 +92,12 @@ def list_load_unload(request):
 
 @login_required
 def delete_load_unload(request, pk):
-    """Delete a Load/Unload transaction"""
+    """Delete a Load/Unload transaction (GLDetail auto-deletes via CASCADE)"""
     try:
         transaction = LoadUnload.objects.get(pk=pk)
         challan_no = transaction.challan_no
         transaction_type = transaction.transaction_type
-        transaction.delete()
+        transaction.delete()  # GLDetail entry auto-deletes via CASCADE
         messages.success(request, f'{transaction_type} transaction (Challan: {challan_no}) deleted successfully!')
     except LoadUnload.DoesNotExist:
         messages.error(request, 'Transaction not found.')

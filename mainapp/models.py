@@ -61,3 +61,61 @@ class LoadUnload(models.Model):
 
     def __str__(self):
         return f"{self.transaction_type} - {self.challan_no} ({self.truck_no})"
+
+
+class ExpenseCategory(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'Expense Categories'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Employee(models.Model):
+    code = models.CharField(max_length=20, primary_key=True)
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    designation = models.CharField(max_length=100, blank=True, null=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-code']
+
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+
+
+class GLDetail(models.Model):
+    INCOME = 'INCOME'
+    EXPENSE = 'EXPENSE'
+    GL_TYPE_CHOICES = [
+        (INCOME, 'Income'),
+        (EXPENSE, 'Expense'),
+    ]
+
+    transaction_date = models.DateField()
+    gl_type = models.CharField(max_length=10, choices=GL_TYPE_CHOICES)
+    category = models.ForeignKey(ExpenseCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='gl_entries')
+    description = models.CharField(max_length=500)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='gl_entries')
+    load_unload = models.ForeignKey(LoadUnload, on_delete=models.CASCADE, null=True, blank=True, related_name='gl_entries')
+    remarks = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-transaction_date', '-created_at']
+        verbose_name = 'GL Detail'
+        verbose_name_plural = 'GL Details'
+
+    def __str__(self):
+        return f"{self.gl_type} - {self.description[:50]} ({self.amount})"

@@ -1,5 +1,5 @@
 from django import forms
-from .models import LoadUnload, Party, Item
+from .models import LoadUnload, Party, Item, ExpenseCategory, Employee, GLDetail
 
 
 class PartyForm(forms.ModelForm):
@@ -192,3 +192,119 @@ class LoadUnloadForm(forms.ModelForm):
             cleaned_data['total_amount'] = quantity * rate_per_qty
         
         return cleaned_data
+
+
+class ExpenseCategoryForm(forms.ModelForm):
+    """Form for creating/editing Expense Category"""
+    
+    class Meta:
+        model = ExpenseCategory
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Enter category name (e.g. Salary, Breakfast)',
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Enter category description',
+                'rows': 3,
+            }),
+        }
+        labels = {
+            'name': 'Category Name',
+            'description': 'Description',
+        }
+
+
+class EmployeeForm(forms.ModelForm):
+    """Form for creating/editing Employee"""
+    
+    class Meta:
+        model = Employee
+        fields = ['name', 'phone', 'designation', 'salary']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Enter employee name',
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Enter phone number',
+            }),
+            'designation': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'e.g. Worker, Driver, Supervisor',
+            }),
+            'salary': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Monthly salary (reference)',
+                'step': '0.01',
+                'min': '0',
+            }),
+        }
+        labels = {
+            'name': 'Employee Name',
+            'phone': 'Phone Number',
+            'designation': 'Designation',
+            'salary': 'Monthly Salary',
+        }
+
+
+class ExpenseForm(forms.ModelForm):
+    """Form for creating expense entries in GLDetail"""
+    
+    class Meta:
+        model = GLDetail
+        fields = ['transaction_date', 'category', 'description', 'amount', 'employee', 'remarks']
+        widgets = {
+            'transaction_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-input',
+            }),
+            'category': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'description': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'What is this expense for?',
+            }),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Enter amount',
+                'step': '0.01',
+                'min': '0',
+            }),
+            'employee': forms.Select(attrs={
+                'class': 'form-select',
+            }),
+            'remarks': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Additional notes (optional)',
+                'rows': 3,
+            }),
+        }
+        labels = {
+            'transaction_date': 'Date',
+            'category': 'Expense Category',
+            'description': 'Description',
+            'amount': 'Amount',
+            'employee': 'Employee (Optional)',
+            'remarks': 'Remarks',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from datetime import date
+        if not self.instance.pk:
+            self.fields['transaction_date'].initial = date.today()
+        
+        self.fields['transaction_date'].required = True
+        self.fields['category'].required = True
+        self.fields['description'].required = True
+        self.fields['amount'].required = True
+        self.fields['employee'].required = False
+        
+        # Only show active categories and employees
+        self.fields['category'].queryset = ExpenseCategory.objects.filter(is_active=True)
+        self.fields['employee'].queryset = Employee.objects.filter(is_active=True)

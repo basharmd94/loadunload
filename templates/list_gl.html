@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}General Ledger - Load Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Summary Cards Row */
+    .gl-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) {
+        .gl-summary {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .gl-summary-card {
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .gl-summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    .gl-summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+    }
+
+    /* Income Card */
+    .gl-card-income {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 1px solid #bbf7d0;
+    }
+    .gl-card-income::before { background: linear-gradient(90deg, #22c55e, #16a34a); }
+    .gl-card-income .gl-card-icon { background: #22c55e; color: white; }
+    .gl-card-income .gl-card-value { color: #15803d; }
+
+    /* Expense Card */
+    .gl-card-expense {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border: 1px solid #fecaca;
+    }
+    .gl-card-expense::before { background: linear-gradient(90deg, #ef4444, #dc2626); }
+    .gl-card-expense .gl-card-icon { background: #ef4444; color: white; }
+    .gl-card-expense .gl-card-value { color: #dc2626; }
+
+    /* Profit Card */
+    .gl-card-profit {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border: 1px solid #bfdbfe;
+    }
+    .gl-card-profit::before { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+    .gl-card-profit .gl-card-icon { background: #3b82f6; color: white; }
+    .gl-card-profit .gl-card-value { color: #1d4ed8; }
+
+    .gl-card-profit.loss {
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        border: 1px solid #fed7aa;
+    }
+    .gl-card-profit.loss::before { background: linear-gradient(90deg, #f97316, #ea580c); }
+    .gl-card-profit.loss .gl-card-icon { background: #f97316; color: white; }
+    .gl-card-profit.loss .gl-card-value { color: #ea580c; }
+
+    .gl-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .gl-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    .gl-card-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .gl-card-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    .gl-card-sub {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+
+    /* GL Table Type Badges */
+    .gl-type-income {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .gl-type-expense {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* Amount styling in table */
+    .amount-income {
+        color: #15803d;
+        font-weight: 600;
+    }
+    .amount-expense {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    /* Running balance column */
+    .balance-positive { color: #15803d; font-weight: 600; }
+    .balance-negative { color: #dc2626; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav class="breadcrumb">
+        <a href="/" class="breadcrumb-item">Home</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-item">General Ledger</span>
+    </nav>
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="page-title">General Ledger</h1>
+            <p class="page-subtitle">Complete financial overview — all income and expense entries.</p>
+        </div>
+        <a href="{% url 'load:create-expense' %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Add Expense
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="gl-summary">
+    <!-- Total Income -->
+    <div class="gl-summary-card gl-card-income">
+        <div class="gl-card-header">
+            <div class="gl-card-icon">
+                <i class="fas fa-arrow-trend-up"></i>
+            </div>
+            <div class="gl-card-label">Total Income</div>
+        </div>
+        <div class="gl-card-value">৳ {{ total_income|floatformat:2 }}</div>
+        <div class="gl-card-sub"><i class="fas fa-truck-loading"></i> From Load/Unload transactions</div>
+    </div>
+
+    <!-- Total Expense -->
+    <div class="gl-summary-card gl-card-expense">
+        <div class="gl-card-header">
+            <div class="gl-card-icon">
+                <i class="fas fa-arrow-trend-down"></i>
+            </div>
+            <div class="gl-card-label">Total Expenses</div>
+        </div>
+        <div class="gl-card-value">৳ {{ total_expense|floatformat:2 }}</div>
+        <div class="gl-card-sub"><i class="fas fa-receipt"></i> Manual expense entries</div>
+    </div>
+
+    <!-- Net Profit/Loss -->
+    <div class="gl-summary-card gl-card-profit {% if net_profit < 0 %}loss{% endif %}">
+        <div class="gl-card-header">
+            <div class="gl-card-icon">
+                {% if net_profit >= 0 %}
+                <i class="fas fa-chart-line"></i>
+                {% else %}
+                <i class="fas fa-chart-line-down"></i>
+                {% endif %}
+            </div>
+            <div class="gl-card-label">
+                {% if net_profit >= 0 %}Net Profit{% else %}Net Loss{% endif %}
+            </div>
+        </div>
+        <div class="gl-card-value">৳ {{ net_profit|floatformat:2 }}</div>
+        <div class="gl-card-sub">
+            {% if net_profit >= 0 %}
+            <i class="fas fa-check-circle"></i> Business is profitable
+            {% else %}
+            <i class="fas fa-exclamation-triangle"></i> Expenses exceed income
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- GL Detail Table -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-book" style="color: var(--primary-color);"></i> Ledger Entries</h2>
+    </div>
+    <div class="card-body">
+        <table id="glTable" class="table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Employee</th>
+                    <th style="text-align: right;">Income (৳)</th>
+                    <th style="text-align: right;">Expense (৳)</th>
+                    <th>Source</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.transaction_date|date:"d M Y" }}</td>
+                    <td>
+                        {% if entry.gl_type == 'INCOME' %}
+                        <span class="gl-type-income"><i class="fas fa-arrow-up"></i> Income</span>
+                        {% else %}
+                        <span class="gl-type-expense"><i class="fas fa-arrow-down"></i> Expense</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ entry.category.name|default:"-" }}</td>
+                    <td>{{ entry.description|truncatewords:8 }}</td>
+                    <td>{{ entry.employee.name|default:"-" }}</td>
+                    <td style="text-align: right;">
+                        {% if entry.gl_type == 'INCOME' %}
+                        <span class="amount-income">{{ entry.amount|floatformat:2 }}</span>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        {% if entry.gl_type == 'EXPENSE' %}
+                        <span class="amount-expense">{{ entry.amount|floatformat:2 }}</span>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if entry.load_unload %}
+                        <span class="badge badge-info" title="Auto-posted from Load/Unload">
+                            <i class="fas fa-link"></i> Auto
+                        </span>
+                        {% else %}
+                        <span class="badge badge-secondary">Manual</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not entry.load_unload %}
+                        <button class="btn btn-sm btn-ghost btn-icon" title="Delete Expense" onclick="confirmDeleteExpense('{{ entry.id }}', '{{ entry.description|escapejs }}')">
+                            <i class="fas fa-trash" style="color: var(--danger-color);"></i>
+                        </button>
+                        {% else %}
+                        <span style="color: var(--text-secondary); font-size: 0.75rem;" title="Delete from Load/Unload page">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr style="font-weight: 700; background: var(--bg-secondary);">
+                    <td colspan="5" style="text-align: right;">Totals:</td>
+                    <td style="text-align: right;">
+                        <span class="amount-income">৳ {{ total_income|floatformat:2 }}</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <span class="amount-expense">৳ {{ total_expense|floatformat:2 }}</span>
+                    </td>
+                    <td colspan="2">
+                        {% if net_profit >= 0 %}
+                        <span class="balance-positive">Profit: ৳ {{ net_profit|floatformat:2 }}</span>
+                        {% else %}
+                        <span class="balance-negative">Loss: ৳ {{ net_profit|floatformat:2 }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.DataTable) {
+        new DataTable('#glTable', {
+            responsive: true,
+            pageLength: 25,
+            order: [[0, 'desc']],
+            layout: {
+                topStart: 'pageLength',
+                topEnd: ['search']
+            },
+            language: {
+                search: 'Search:',
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                infoEmpty: 'No ledger entries available',
+                emptyTable: 'No entries in the general ledger yet'
+            },
+            columnDefs: [
+                { targets: -1, orderable: false, searchable: false },
+                { targets: [5, 6], type: 'num' }
+            ]
+        });
+    }
+});
+
+function confirmDeleteExpense(id, desc) {
+    Swal.fire({
+        title: 'Delete Expense?',
+        text: `Are you sure you want to delete "${desc}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/delete-expense/${id}/`;
+        }
+    });
+}
+</script>
+{% endblock %}

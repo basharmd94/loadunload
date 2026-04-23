@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Expense - Load Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .split-layout {
+        display: grid;
+        grid-template-columns: 450px 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .split-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .expense-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+    .expense-item:last-child {
+        border-bottom: none;
+    }
+    .expense-item:hover {
+        background: var(--bg-secondary);
+    }
+    .expense-info {
+        flex: 1;
+    }
+    .expense-desc {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+    .expense-meta {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 0.15rem;
+    }
+    .expense-amount {
+        font-weight: 600;
+        color: var(--danger-color);
+        font-size: 0.9rem;
+        white-space: nowrap;
+        margin-left: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav class="breadcrumb">
+        <a href="/" class="breadcrumb-item">Home</a>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-item">Add Expense</span>
+    </nav>
+    <h1 class="page-title">Add Expense</h1>
+    <p class="page-subtitle">Record a new expense entry. It will be posted to the General Ledger automatically.</p>
+</div>
+
+<div class="split-layout">
+    <!-- Left Side: Form -->
+    <div class="form-card">
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">
+            <i class="fas fa-receipt" style="color: var(--danger-color);"></i> New Expense Entry
+        </h2>
+        
+        <form method="POST" id="expenseForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.transaction_date.label }}</label>
+                {{ form.transaction_date }}
+                {% if form.transaction_date.errors %}
+                    <span class="form-error">{{ form.transaction_date.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required">{{ form.category.label }}</label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                    <span class="form-error">{{ form.category.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <span class="form-error">{{ form.description.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.amount.label }}</label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                    <span class="form-error">{{ form.amount.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.employee.label }}</label>
+                {{ form.employee }}
+                {% if form.employee.errors %}
+                    <span class="form-error">{{ form.employee.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.remarks.label }}</label>
+                {{ form.remarks }}
+                {% if form.remarks.errors %}
+                    <span class="form-error">{{ form.remarks.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions" style="margin-top: 1rem; padding-top: 1rem;">
+                <button type="reset" class="btn btn-outline btn-sm">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-save"></i> Save Expense
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Right Side: Recent Expenses -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Recent Expenses</h2>
+            <a href="{% url 'load:list-gl' %}" class="btn btn-sm btn-outline">
+                <i class="fas fa-book"></i> View Full Ledger
+            </a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            {% for exp in recent_expenses %}
+            <div class="expense-item">
+                <div class="expense-info">
+                    <div class="expense-desc">{{ exp.description }}</div>
+                    <div class="expense-meta">
+                        <i class="fas fa-calendar-alt"></i> {{ exp.transaction_date }}
+                        {% if exp.category %} &middot; <i class="fas fa-tag"></i> {{ exp.category.name }}{% endif %}
+                        {% if exp.employee %} &middot; <i class="fas fa-user"></i> {{ emp.employee.name }}{% endif %}
+                    </div>
+                </div>
+                <div class="expense-amount">৳ {{ exp.amount|floatformat:2 }}</div>
+            </div>
+            {% empty %}
+            <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+                <i class="fas fa-receipt" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.3;"></i>
+                No expenses recorded yet
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#id_category').select2({
+        placeholder: 'Select a category',
+        allowClear: true,
+        width: '100%'
+    });
+    $('#id_employee').select2({
+        placeholder: 'Select an employee (optional)',
+        allowClear: true,
+        width: '100%'
+    });
+});
+</script>
+{% endblock %}

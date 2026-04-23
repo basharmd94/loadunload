@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Category Management - Load Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .split-layout {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .split-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Expense Category Management</h1>
+</div>
+
+<div class="split-layout">
+    <!-- Left Side: Form -->
+    <div class="form-card">
+        <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">
+            {% if editing %}Edit Category: {{ edit_category.name }}{% else %}Add New Category{% endif %}
+        </h2>
+        
+        <form method="POST" id="categoryForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label required">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <span class="form-error">{{ form.name.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <span class="form-error">{{ form.description.errors.0 }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions" style="margin-top: 1rem; padding-top: 1rem;">
+                {% if editing %}
+                <a href="{% url 'load:create-category' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                {% else %}
+                <button type="reset" class="btn btn-outline btn-sm">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                {% endif %}
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-save"></i> {% if editing %}Update{% else %}Save{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Right Side: List -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Category List</h2>
+        </div>
+        <div class="card-body">
+            <table id="categoryTable" class="table" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td><strong>{{ cat.id }}</strong></td>
+                        <td>{{ cat.name }}</td>
+                        <td>{{ cat.description|default:"-"|truncatewords:10 }}</td>
+                        <td>
+                            {% if cat.is_active %}
+                            <span class="badge badge-success">Active</span>
+                            {% else %}
+                            <span class="badge badge-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'load:edit-category' cat.id %}" class="btn btn-sm btn-ghost btn-icon" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-sm btn-ghost btn-icon" title="Delete" onclick="confirmDelete('{{ cat.id }}', '{{ cat.name }}')">
+                                <i class="fas fa-trash" style="color: var(--danger-color);"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.DataTable) {
+        new DataTable('#categoryTable', {
+            responsive: true,
+            pageLength: 10,
+            order: [[0, 'desc']],
+            layout: {
+                topStart: 'pageLength',
+                topEnd: ['search']
+            },
+            language: {
+                search: 'Search:',
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ categories',
+                infoEmpty: 'No categories available',
+                emptyTable: 'No categories created yet'
+            },
+            columnDefs: [
+                { targets: -1, orderable: false, searchable: false }
+            ]
+        });
+    }
+});
+
+function confirmDelete(id, name) {
+    Swal.fire({
+        title: 'Delete Category?',
+        text: `Are you sure you want to delete "${name}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/delete-category/${id}/`;
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -3,6 +3,9 @@ from .views import home
 from .views import load_unload
 from .views import item
 from .views import party
+from .views import employee
+from .views import category
+from .views import expense
 
 app_name = 'load'
 
@@ -26,4 +29,19 @@ urlpatterns = [
     path('delete-load-unload/<str:pk>/', load_unload.delete_load_unload, name='delete-load-unload'),
     path('recent-loads/', load_unload.recent_loads, name='recent-loads'),
     path('recent-unloads/', load_unload.recent_unloads, name='recent-unloads'),
+
+# employees
+    path('create-employee/', employee.create_employee, name='create-employee'),
+    path('edit-employee/<str:code>/', employee.create_employee, name='edit-employee'),
+    path('delete-employee/<str:code>/', employee.delete_employee, name='delete-employee'),
+
+# expense categories
+    path('create-category/', category.create_category, name='create-category'),
+    path('edit-category/<int:pk>/', category.create_category, name='edit-category'),
+    path('delete-category/<int:pk>/', category.delete_category, name='delete-category'),
+
+# expenses / GL
+    path('create-expense/', expense.create_expense, name='create-expense'),
+    path('list-gl/', expense.list_gl, name='list-gl'),
+    path('delete-expense/<int:pk>/', expense.delete_expense, name='delete-expense'),
 ]
